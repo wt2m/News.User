@@ -1,0 +1,43 @@
+version: '3.4'
+
+services:
+  sqlserver-users-news:
+      container_name: sqlserver-users-news
+      image: "mcr.microsoft.com/mssql/server:2022-latest"
+      environment:
+        - SA_PASSWORD=YourStrongPassword123
+        - ACCEPT_EULA=Y
+      ports:
+        - "1433:1433"
+      networks:
+        - appnetwork
+      healthcheck:
+        test: ["CMD-SHELL", "grep -q 'SQL Server is now ready for client connections' /var/opt/mssql/log/errorlog || exit 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+        start_period: 5s
+
+  userservice-api:
+    container_name: userservice-api
+    image: userservice-api:dev
+    build:
+      context: .
+      dockerfile: UserService.Api/Dockerfile
+    ports:
+      - "7003:7003"
+      - "7004:7004"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      sqlserver-users-news:
+        condition: service_healthy
+    networks:
+      - appnetwork
+
+volumes:
+  sqlvolume:
+
+networks:
+  appnetwork:
+    driver: bridge
