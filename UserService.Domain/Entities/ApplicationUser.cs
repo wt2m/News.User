@@ -10,7 +10,13 @@ namespace UserService.Domain.Entities
     public class ApplicationUser : IdentityUser<Guid>
     {
         // Add any additional properties that your domain requires
-        public string FullName { get; private set; }
+        public string? FullName { get; private set; }
+
+
+        // Parameterless constructor needed by EF Core
+        public ApplicationUser()
+        {
+        }
 
         // Constructor for creating a new user
         public ApplicationUser(string email, string username, string fullName)
