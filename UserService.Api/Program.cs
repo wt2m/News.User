@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
@@ -52,7 +53,47 @@ builder.Services.AddScoped<RegisterUserUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase>();
 builder.Services.AddScoped<ValidateTokenUseCase>();
 
+
 var app = builder.Build();
+
+
+
+// Run migrations at startup.
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+
+    try
+    {
+        var configuration = services.GetRequiredService<IConfiguration>();
+        var connectionString = configuration.GetConnectionString("DefaultConnection")!;
+
+        // Step 1: Check if the database exists, and create it if it doesn't
+        EnsureDatabaseExists(connectionString);
+
+        // Step 2: Apply EF Core migrations
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate(); // Apply any pending migrations
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred creating the database or applying migrations.");
+    }
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        context.Database.Migrate(); // This will apply any pending migrations.
+    }
+    catch (Exception ex)
+    {
+        // Log errors or handle them as necessary.
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -71,3 +112,29 @@ app.MapControllers();
 
 app.Run();
 
+
+
+// Helper method to check if the database exists and create it if not
+void EnsureDatabaseExists(string connectionString)
+{
+    var builder = new SqlConnectionStringBuilder(connectionString);
+
+    // Connect to the master database to check if the target database exists
+    var masterConnectionString = new SqlConnectionStringBuilder(connectionString)
+    {
+        InitialCatalog = "master" // Use master database to check and create the target database
+    }.ConnectionString;
+
+    using (var connection = new SqlConnection(masterConnectionString))
+    {
+        connection.Open();
+        var checkDatabaseExistsCommand = connection.CreateCommand();
+        checkDatabaseExistsCommand.CommandText = $@"
+            IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = '{builder.InitialCatalog}')
+            BEGIN
+                CREATE DATABASE [{builder.InitialCatalog}]
+            END";
+
+        checkDatabaseExistsCommand.ExecuteNonQuery();
+    }
+}
