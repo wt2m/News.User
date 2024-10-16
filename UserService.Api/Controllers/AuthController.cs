@@ -10,11 +10,13 @@ namespace UserService.Api.Controllers
     {
         private readonly RegisterUserUseCase _registerUserUseCase;
         private readonly AuthenticateUserUseCase _authenticateUserUseCase;
+        private readonly ValidateTokenUseCase _validateTokenUseCase;
 
-        public AuthController(RegisterUserUseCase registerUserUseCase, AuthenticateUserUseCase authenticateUserUseCase)
+        public AuthController(RegisterUserUseCase registerUserUseCase, AuthenticateUserUseCase authenticateUserUseCase, ValidateTokenUseCase validateTokenUseCase)
         {
             _registerUserUseCase = registerUserUseCase;
             _authenticateUserUseCase = authenticateUserUseCase;
+            _validateTokenUseCase = validateTokenUseCase;
         }
 
         // POST: api/auth/register
@@ -57,6 +59,19 @@ namespace UserService.Api.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+
+        [HttpGet("verifyToken")]
+        public IActionResult VerifyToken([FromQuery] string token)
+        {
+            var validated = _validateTokenUseCase.ValidateUserToken(token);
+            if (!validated)
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            return Ok("Token is valid");
         }
     }
 }
