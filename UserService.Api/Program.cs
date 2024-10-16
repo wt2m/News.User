@@ -36,9 +36,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
-            ValidateIssuer = false,
-            ValidateAudience = false,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"],
             ValidateLifetime = true,
             ClockSkew = TimeSpan.Zero
         };
@@ -49,6 +51,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<JwtTokenService>();
 builder.Services.AddScoped<RegisterUserUseCase>();
 builder.Services.AddScoped<AuthenticateUserUseCase>();
+builder.Services.AddScoped<ValidateTokenUseCase>();
 
 
 var app = builder.Build();

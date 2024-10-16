@@ -16,26 +16,31 @@ namespace UserService.Infrastructure.Identity
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly byte[] _key;
+        private readonly string _audience;
+        private readonly string _issuer;
 
         public JwtTokenService(UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _key = Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"]!);
+            _audience = _configuration["Jwt:Audience"]!;
+            _issuer = _configuration["Jwt:Issuer"]!;
+
         }
 
         public async Task<string> GenerateTokenAsync(ApplicationUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:SecretKey"]!);
 
             var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+            {
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-            // Optionally, add user roles if needed
             var roles = await _userManager.GetRolesAsync(user);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
@@ -43,11 +48,39 @@ namespace UserService.Infrastructure.Identity
             {
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(2),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature),
+                Audience = _audience,
+                Issuer = _issuer,
             };
 
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+
+        public ClaimsPrincipal VerifyTokenAsync(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(_key),
+                    ValidateIssuer = true,
+                    ValidIssuer = _issuer,
+                    ValidateAudience = true,
+                    ValidAudience = _audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // Disable clock skew
+                }, out SecurityToken validatedToken);
+
+                return principal;
+            }
+            catch (SecurityTokenException e)
+            {
+                return null;
+            }
         }
     }
 }
