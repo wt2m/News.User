@@ -16,7 +16,7 @@ using UserService.Domain.Repositories;
 
 namespace UserService.Infrastructure.Messaging.RabbitMq
 {
-    public class RabbitMqUserPreferenceConsumer : BackgroundService
+    internal class RabbitMqUserPreferenceConsumer : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider; // Inject IServiceProvider
         private readonly IConnection _connection;

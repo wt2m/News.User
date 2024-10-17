@@ -5,7 +5,7 @@ using UserService.Domain.Repositories;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class UserAuthenticationService : AbstractUowService, IUserAuthenticationService
+    internal class UserAuthenticationService : AbstractUowService, IUserAuthenticationService
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;

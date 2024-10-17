@@ -10,7 +10,7 @@ using UserService.Infrastructure.Identity;
 
 namespace UserService.Infrastructure.Repositories
 {
-    public class UnitOfWork : IUnitOfWork
+    internal class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext _context;
         private readonly IUserRepository _userRepository;

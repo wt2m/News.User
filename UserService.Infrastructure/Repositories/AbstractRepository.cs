@@ -11,7 +11,7 @@ using UserService.Infrastructure.Data;
 
 namespace UserService.Infrastructure.Repositories
 {
-    public abstract class AbstractRepository<TEntity> : IAbstractRepository<TEntity> where TEntity : PersistentData
+    internal abstract class AbstractRepository<TEntity> : IAbstractRepository<TEntity> where TEntity : PersistentData
     {
         protected readonly ApplicationDbContext _context;
         public AbstractRepository(ApplicationDbContext context)

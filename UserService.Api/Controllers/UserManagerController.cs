@@ -12,7 +12,7 @@ using UserService.Infrastructure.Identity;
 public class UserController : ControllerBase
 {
 
-    public UserController(UserManager<ApplicationUser> userManager)
+    public UserController()
     {
     }
 

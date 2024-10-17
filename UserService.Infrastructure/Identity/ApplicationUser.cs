@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class ApplicationUser : IdentityUser<Guid>
+    internal class ApplicationUser : IdentityUser<Guid>
     {
         // Add any additional properties that your domain requires
         public string? FullName { get; private set; }

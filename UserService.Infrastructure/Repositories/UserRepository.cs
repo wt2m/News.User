@@ -12,7 +12,7 @@ using UserService.Infrastructure.Repositories;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class UserRepository : AbstractRepository<User>, IUserRepository
+    internal class UserRepository : AbstractRepository<User>, IUserRepository
     {
         public UserRepository(ApplicationDbContext _context) : base(_context)
         {

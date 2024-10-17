@@ -34,8 +34,12 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      kibana:
+        condition: service_healthy
     networks:
       - appnetwork
+      - observability
+      - mq
 
   rabbitmq:
     container_name: rabbitmq
@@ -47,7 +51,7 @@ services:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
     networks:
-      - appnetwork
+      - mq
     healthcheck:
       test: ["CMD-SHELL", "rabbitmq-diagnostics ping | grep -q 'Ping succeeded'"]
       interval: 10s
@@ -55,9 +59,62 @@ services:
       retries: 5
       start_period: 20s
 
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false   # Disable security features
+      - xpack.security.transport.ssl.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - esdata:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - observability
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s        
+      retries: 5          
+      start_period: 10s 
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.6.0
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_SECURITY_ENABLED=false
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - observability
+    healthcheck:
+      test: ["CMD-SHELL", "[ -d /usr/share/kibana ] || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
 volumes:
+  esdata:
+    driver: local
   sqlvolume:
 
 networks:
   appnetwork:
+    driver: bridge
+  observability:
+    driver: bridge
+  mq:
     driver: bridge

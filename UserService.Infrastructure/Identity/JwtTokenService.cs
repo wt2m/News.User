@@ -8,7 +8,7 @@ using UserService.Application.Interfaces;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class JwtTokenService : ITokenService
+    internal class JwtTokenService : ITokenService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;

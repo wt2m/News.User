@@ -14,7 +14,7 @@ using UserService.Infrastructure.Repositories;
 
 namespace UserService.Infrastructure.DependencyInjection
 {
-    public static class RabbitMqServiceRegistration
+    public static class MqServiceRegistration
     {
         public static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration configuration)
         {

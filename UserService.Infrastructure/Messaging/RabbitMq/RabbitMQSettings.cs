@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UserService.Infrastructure.Messaging.RabbitMq
 {
-    public class RabbitMQSettings
+    internal class RabbitMQSettings
     {
         public required string HostName { get; set; }
         public int Port { get; set; }

@@ -7,7 +7,7 @@ using UserService.Application.Services;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class UserRegistrationService : AbstractUowService, IUserRegistrationService
+    internal class UserRegistrationService : AbstractUowService, IUserRegistrationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
