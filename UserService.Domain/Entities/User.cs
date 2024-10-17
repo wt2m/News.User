@@ -12,8 +12,10 @@ namespace UserService.Domain.Entities
         
         public string Email { get; private set; }
         public string FullName { get; private set; }
-        public string UserName { get; set; }
+        public string UserName { get; private set; }
         public bool IsActive { get; private set; }
+
+        public List<string>? Preferences { get; private set; }
 
         public User(string email, string fullName, string userName)
         {
@@ -27,6 +29,18 @@ namespace UserService.Domain.Entities
         public void ActivateUser()
         {
             IsActive = true;
+        }
+
+
+        public void AddPreferences(string preference)
+        {
+            if (Preferences == null)
+                Preferences = new List<string>();
+
+            if (Preferences.Contains(preference))
+                return;
+
+            Preferences.Add(preference);
         }
     }
 }

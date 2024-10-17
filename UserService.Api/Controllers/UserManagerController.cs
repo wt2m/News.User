@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using UserService.Application.DTOs;
 using UserService.Domain.Entities;
+using UserService.Infrastructure.Identity;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -17,7 +18,7 @@ public class UserController : ControllerBase
 
     [Authorize] 
     [HttpPut("update-fullname")]
-    public async Task<IActionResult> UpdateProfile([FromBody] UpdateFullNameRequest model)
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateUserRequest model)
     {
         // Get the user ID from the JWT token claims
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -26,20 +27,10 @@ public class UserController : ControllerBase
             return Unauthorized("Invalid token. No user ID found.");
         }
 
-        // Find the user by ID
-        var user = await _userManager.FindByIdAsync(userId);
-        if (user == null)
-            return NotFound("User not found.");
-
-        user.UpdateProfile(model.FullName);
-
-        // Save the changes
-        var result = await _userManager.UpdateAsync(user);
-        if (result.Succeeded)
-            return Ok("Profile updated successfully.");
+        await Task.Delay(1);
         
-        // If updating fails, return the errors
-        return BadRequest(result.Errors);
+        //TODO: Implement the update user function
+        throw new NotImplementedException();
     }
 
     

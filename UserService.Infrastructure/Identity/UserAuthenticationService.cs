@@ -1,19 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Authentication;
-using System.Text;
-using System.Threading.Tasks;
-using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Application.Services;
-using UserService.Domain.Entities;
 using UserService.Domain.Repositories;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class UserAuthenticationService : AbstractService, IUserAuthenticationService
+    public class UserAuthenticationService : AbstractUowService, IUserAuthenticationService
     {
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;

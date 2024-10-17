@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using UserService.Domain.Entities;
+using UserService.Infrastructure.Identity;
 
 namespace UserService.Infrastructure.Data
 {

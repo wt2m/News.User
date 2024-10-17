@@ -11,7 +11,9 @@ namespace UserService.Application.Interfaces
     public interface ITokenService
     {
         Task<string> GenerateTokenAsync(Guid userId);
-        ClaimsPrincipal? VerifyTokenAsync(string token);
+        bool VerifyTokenAsync(string token);
+        Guid GetUserIdByToken(string token);
+
 
     }
 }

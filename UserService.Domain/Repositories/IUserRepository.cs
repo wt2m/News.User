@@ -11,5 +11,6 @@ namespace UserService.Domain.Repositories
     {
         Task AddAsync(User user);
         Task<User?> GetByEmailAsync(string email);
+        Task UpdateUserPreferencesAsync(Guid userId, string preference);
     }
 }

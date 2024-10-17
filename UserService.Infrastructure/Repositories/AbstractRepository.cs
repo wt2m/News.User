@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using UserService.Application.Interfaces;
 using UserService.Domain.Entities.Abstract;
+using UserService.Domain.Repositories;
 using UserService.Infrastructure.Data;
 
 namespace UserService.Infrastructure.Repositories
 {
-    public abstract class AbstractRepository<TEntity> where TEntity : PersistentData
+    public abstract class AbstractRepository<TEntity> : IAbstractRepository<TEntity> where TEntity : PersistentData
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
         public AbstractRepository(ApplicationDbContext context)
         {
             _context = context;
@@ -29,6 +30,9 @@ namespace UserService.Infrastructure.Repositories
 
         public void Update(TEntity entity)
         {
+            if (entity.Id == Guid.Empty)
+                throw new Exception("The entity you tried to update is not on the database.");
+
             _context.Update(entity);
         }
 
@@ -43,5 +47,9 @@ namespace UserService.Infrastructure.Repositories
             _context.Update(entity);
         }
 
+        public TEntity GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

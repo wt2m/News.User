@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UserService.Application.DTOs
 {
-    public class UpdateFullNameRequest
+    public class UpdateUserRequest
     {
         public required string FullName { get; set; }
     }

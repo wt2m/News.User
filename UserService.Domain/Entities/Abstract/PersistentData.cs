@@ -1,11 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace UserService.Domain.Entities.Abstract
+﻿namespace UserService.Domain.Entities.Abstract
 {
     public abstract class PersistentData
     {

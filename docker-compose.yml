@@ -32,8 +32,28 @@ services:
     depends_on:
       sqlserver-users-news:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     networks:
       - appnetwork
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:management"
+    ports:
+      - "15672:15672"  # Management UI
+      - "5672:5672"    # RabbitMQ port
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - appnetwork
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics ping | grep -q 'Ping succeeded'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   sqlvolume:

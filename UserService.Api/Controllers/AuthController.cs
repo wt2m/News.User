@@ -10,14 +10,12 @@ namespace UserService.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserRegistrationService _userRegistrationService;
-        private readonly IUserService _userService;
         private readonly IUserAuthenticationService _userAuthenticationService;
         private readonly ITokenService _tokenService;
 
-        public AuthController(IUserRegistrationService userRegistrationService, IUserService userService, IUserAuthenticationService userAuthenticationService, ITokenService tokenService)
+        public AuthController(IUserRegistrationService userRegistrationService, IUserAuthenticationService userAuthenticationService, ITokenService tokenService)
         {
             _userAuthenticationService = userAuthenticationService;
-            _userService = userService;
             _userRegistrationService = userRegistrationService;
             _tokenService = tokenService;
         }
@@ -68,8 +66,8 @@ namespace UserService.Api.Controllers
         [HttpGet("verifyToken")]
         public IActionResult VerifyToken([FromQuery] string token)
         {
-            var claims = _tokenService.VerifyTokenAsync(token);
-            if (claims == null)
+            var validatedBoolean = _tokenService.VerifyTokenAsync(token);
+            if (!validatedBoolean)
             {
                 return Unauthorized("Invalid token");
             }

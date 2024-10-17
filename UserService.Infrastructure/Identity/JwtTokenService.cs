@@ -1,15 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using UserService.Application.Interfaces;
-using UserService.Domain.Entities;
 
 namespace UserService.Infrastructure.Identity
 {
@@ -61,13 +56,42 @@ namespace UserService.Infrastructure.Identity
         }
 
 
-        public ClaimsPrincipal? VerifyTokenAsync(string token)
+        public bool VerifyTokenAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            ClaimsPrincipal? principal = null;
+
             try
             {
-                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                principal  = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(_key),
+                    ValidateIssuer = true,
+                    ValidIssuer = _issuer,
+                    ValidateAudience = true,
+                    ValidAudience = _audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // Disable clock skew
+                }, out SecurityToken validatedToken);
+            }
+            catch
+            {
+            }
+            
+            return principal != null;
+        }
+
+        public Guid GetUserIdByToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            ClaimsPrincipal? principal = null;
+
+            try
+            {
+                principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(_key),
@@ -79,12 +103,15 @@ namespace UserService.Infrastructure.Identity
                     ClockSkew = TimeSpan.Zero // Disable clock skew
                 }, out SecurityToken validatedToken);
 
-                return principal;
+                var userId = new Guid(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                return userId;
             }
-            catch (SecurityTokenException)
+            catch
             {
-                return null;
+                throw new Exception("Error trying to retrieve user id from token");
             }
+
         }
     }
 }

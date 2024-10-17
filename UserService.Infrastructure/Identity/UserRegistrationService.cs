@@ -1,18 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Application.Mappers;
-using UserService.Application.Services;
 using UserService.Domain.Entities;
+using UserService.Application.Services;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class UserRegistrationService : AbstractService, IUserRegistrationService
+    public class UserRegistrationService : AbstractUowService, IUserRegistrationService
     {
         private readonly UserManager<ApplicationUser> _userManager;
 
