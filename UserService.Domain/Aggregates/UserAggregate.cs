@@ -9,9 +9,9 @@ namespace UserService.Domain.Aggregates
 {
     public class UserAggregate
     {
-        public ApplicationUser User { get; private set; }
+        public User User { get; private set; }
 
-        public UserAggregate(ApplicationUser user)
+        public UserAggregate(User user)
         {
             User = user;
         }

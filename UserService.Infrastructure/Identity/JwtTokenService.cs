@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using UserService.Domain.Entities;
+using UserService.Application.Interfaces;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class JwtTokenService
+    public class JwtTokenService : ITokenService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
@@ -30,18 +26,20 @@ namespace UserService.Infrastructure.Identity
 
         }
 
-        public async Task<string> GenerateTokenAsync(ApplicationUser user)
+        public async Task<string> GenerateTokenAsync(Guid userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            var appUser = await _userManager.FindByIdAsync(userId.ToString());
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, appUser!.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(appUser);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -57,13 +55,43 @@ namespace UserService.Infrastructure.Identity
             return tokenHandler.WriteToken(token);
         }
 
-        public ClaimsPrincipal VerifyTokenAsync(string token)
+
+        public bool VerifyTokenAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            ClaimsPrincipal? principal = null;
+
             try
             {
-                var principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                principal  = tokenHandler.ValidateToken(token, new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(_key),
+                    ValidateIssuer = true,
+                    ValidIssuer = _issuer,
+                    ValidateAudience = true,
+                    ValidAudience = _audience,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero // Disable clock skew
+                }, out SecurityToken validatedToken);
+            }
+            catch
+            {
+            }
+            
+            return principal != null;
+        }
+
+        public Guid GetUserIdByToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            ClaimsPrincipal? principal = null;
+
+            try
+            {
+                principal = tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(_key),
@@ -75,12 +103,15 @@ namespace UserService.Infrastructure.Identity
                     ClockSkew = TimeSpan.Zero // Disable clock skew
                 }, out SecurityToken validatedToken);
 
-                return principal;
+                var userId = new Guid(principal.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+                return userId;
             }
-            catch (SecurityTokenException e)
+            catch
             {
-                return null;
+                throw new Exception("Error trying to retrieve user id from token");
             }
+
         }
     }
 }

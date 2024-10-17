@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UserService.Domain.Entities
+namespace UserService.Infrastructure.Identity
 {
     public class ApplicationUser : IdentityUser<Guid>
     {
         // Add any additional properties that your domain requires
         public string? FullName { get; private set; }
-        public List<string> Preferences { get; private set; }
+        
 
 
         // Parameterless constructor needed by EF Core
@@ -20,13 +20,12 @@ namespace UserService.Domain.Entities
         }
 
         // Constructor for creating a new user
-        public ApplicationUser(string email, string username, string fullName)
+        public ApplicationUser(Guid id, string email, string username, string fullName)
         {
-            Id = Guid.NewGuid(); // New GUID for new users
+            Id = id; // New GUID for new users
             Email = email;
             UserName = username;
             FullName = fullName;
-            Preferences = new List<string>();
         }
 
         // Method to update user profile
@@ -35,9 +34,7 @@ namespace UserService.Domain.Entities
             FullName = fullName;
         }
 
-        public void AddPreference(string preference)
-        {
-            Preferences.Add(preference);
-        }
+        
+
     }
 }

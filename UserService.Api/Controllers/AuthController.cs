@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using UserService.Application.DTOs;
-using UserService.Application.UseCases;
+using UserService.Application.Interfaces;
+using UserService.Application.Services;
 
 namespace UserService.Api.Controllers
 {
@@ -8,15 +9,15 @@ namespace UserService.Api.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly RegisterUserUseCase _registerUserUseCase;
-        private readonly AuthenticateUserUseCase _authenticateUserUseCase;
-        private readonly ValidateTokenUseCase _validateTokenUseCase;
+        private readonly IUserRegistrationService _userRegistrationService;
+        private readonly IUserAuthenticationService _userAuthenticationService;
+        private readonly ITokenService _tokenService;
 
-        public AuthController(RegisterUserUseCase registerUserUseCase, AuthenticateUserUseCase authenticateUserUseCase, ValidateTokenUseCase validateTokenUseCase)
+        public AuthController(IUserRegistrationService userRegistrationService, IUserAuthenticationService userAuthenticationService, ITokenService tokenService)
         {
-            _registerUserUseCase = registerUserUseCase;
-            _authenticateUserUseCase = authenticateUserUseCase;
-            _validateTokenUseCase = validateTokenUseCase;
+            _userAuthenticationService = userAuthenticationService;
+            _userRegistrationService = userRegistrationService;
+            _tokenService = tokenService;
         }
 
         // POST: api/auth/register
@@ -25,14 +26,14 @@ namespace UserService.Api.Controllers
         {
             try
             {
-                var result = await _registerUserUseCase.RegisterAsync(request);
-                if (result.Succeeded)
+                var result = await _userRegistrationService.RegisterUserAsync(request);
+                if (result != null)
                 {
                     return Ok("User registered successfully.");
                 }
                 else
                 {
-                    return BadRequest(result.Errors);
+                    return BadRequest("Error trying to register user.");
                 }
             }
             catch (Exception ex)
@@ -47,7 +48,7 @@ namespace UserService.Api.Controllers
         {
             try
             {
-                var token = await _authenticateUserUseCase.AuthenticateAsync(request);
+                var token = await _userAuthenticationService.AuthenticateUserAsync(request.Email, request.Password);
                 if (token == null)
                 {
                     return Unauthorized("Invalid credentials.");
@@ -65,8 +66,8 @@ namespace UserService.Api.Controllers
         [HttpGet("verifyToken")]
         public IActionResult VerifyToken([FromQuery] string token)
         {
-            var validated = _validateTokenUseCase.ValidateUserToken(token);
-            if (!validated)
+            var validatedBoolean = _tokenService.VerifyTokenAsync(token);
+            if (!validatedBoolean)
             {
                 return Unauthorized("Invalid token");
             }

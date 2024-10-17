@@ -5,11 +5,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
-using UserService.Application.UseCases;
+using UserService.Application.Interfaces;
 using UserService.Domain.Entities;
 using UserService.Domain.Repositories;
+using UserService.Infrastructure;
 using UserService.Infrastructure.Data;
+using UserService.Infrastructure.DependencyInjection;
 using UserService.Infrastructure.Identity;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,38 +24,12 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add the ApplicationDbContext with SQL Server
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Add Identity services
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
-
-// Add JWT authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]!)),
-            ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
-    });
+builder.Services.AddIdentityAndJwtRegistration(builder.Configuration);
 
 // Add application services
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<JwtTokenService>();
-builder.Services.AddScoped<RegisterUserUseCase>();
-builder.Services.AddScoped<AuthenticateUserUseCase>();
-builder.Services.AddScoped<ValidateTokenUseCase>();
+builder.Services.AddInfrastructureServices();
+builder.Services.AddRabbitMq(builder.Configuration);
 
 
 var app = builder.Build();
