@@ -8,11 +8,12 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using UserService.Application.Interfaces;
 using UserService.Domain.Entities;
 
 namespace UserService.Infrastructure.Identity
 {
-    public class JwtTokenService
+    public class JwtTokenService : ITokenService
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
@@ -30,18 +31,20 @@ namespace UserService.Infrastructure.Identity
 
         }
 
-        public async Task<string> GenerateTokenAsync(ApplicationUser user)
+        public async Task<string> GenerateTokenAsync(Guid userId)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
+            var appUser = await _userManager.FindByIdAsync(userId.ToString());
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, appUser!.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, appUser.Id.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(appUser);
             claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -57,7 +60,8 @@ namespace UserService.Infrastructure.Identity
             return tokenHandler.WriteToken(token);
         }
 
-        public ClaimsPrincipal VerifyTokenAsync(string token)
+
+        public ClaimsPrincipal? VerifyTokenAsync(string token)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -77,7 +81,7 @@ namespace UserService.Infrastructure.Identity
 
                 return principal;
             }
-            catch (SecurityTokenException e)
+            catch (SecurityTokenException)
             {
                 return null;
             }

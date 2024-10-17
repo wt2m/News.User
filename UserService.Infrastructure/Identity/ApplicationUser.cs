@@ -11,7 +11,7 @@ namespace UserService.Domain.Entities
     {
         // Add any additional properties that your domain requires
         public string? FullName { get; private set; }
-        public List<string> Preferences { get; private set; }
+        public List<string>? Preferences { get; private set; }
 
 
         // Parameterless constructor needed by EF Core
@@ -20,9 +20,9 @@ namespace UserService.Domain.Entities
         }
 
         // Constructor for creating a new user
-        public ApplicationUser(string email, string username, string fullName)
+        public ApplicationUser(Guid id, string email, string username, string fullName)
         {
-            Id = Guid.NewGuid(); // New GUID for new users
+            Id = id; // New GUID for new users
             Email = email;
             UserName = username;
             FullName = fullName;
@@ -35,9 +35,16 @@ namespace UserService.Domain.Entities
             FullName = fullName;
         }
 
-        public void AddPreference(string preference)
+        public void AddPreferences(string preference)
         {
+            if(Preferences == null)
+                Preferences = new List<string>();
+
+            if (Preferences.Contains(preference))
+                return;
+
             Preferences.Add(preference);
         }
+
     }
 }

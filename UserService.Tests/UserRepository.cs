@@ -23,7 +23,7 @@ namespace UserService.Infrastructure.Identity
             var user = await _userManager.FindByEmailAsync(email);
             if(user == null)
             {
-
+                throw new Exception("User not found.");
             }
             return user!;
         }
@@ -34,7 +34,7 @@ namespace UserService.Infrastructure.Identity
 
             if(user == null)
             {
-
+                throw new Exception("User not found.");
             }
 
             return user!;

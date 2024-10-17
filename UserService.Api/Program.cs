@@ -5,11 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
-using UserService.Application.UseCases;
+using UserService.Application.Interfaces;
 using UserService.Domain.Entities;
 using UserService.Domain.Repositories;
+using UserService.Infrastructure;
 using UserService.Infrastructure.Data;
 using UserService.Infrastructure.Identity;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,11 +50,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 // Add application services
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<JwtTokenService>();
-builder.Services.AddScoped<RegisterUserUseCase>();
-builder.Services.AddScoped<AuthenticateUserUseCase>();
-builder.Services.AddScoped<ValidateTokenUseCase>();
+builder.Services.AddInfrastructureServices();
 
 
 var app = builder.Build();

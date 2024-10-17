@@ -8,9 +8,9 @@ using UserService.Domain.Entities;
 
 namespace UserService.Application.Mappers
 {
-    public class UserMapper
+    public static class UserMapper
     {
-        public static UserDTO ToUserDTO(ApplicationUser user)
+        public static UserDTO ToUserDTO(User user)
         {
             return new UserDTO
             {
