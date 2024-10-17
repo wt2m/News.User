@@ -5,6 +5,7 @@ using UserService.Domain.Repositories;
 using UserService.Infrastructure.Identity;
 using UserService.Infrastructure.Repositories;
 
+
 namespace UserService.Infrastructure
 {
     public static class InfrastructureServiceRegistration
@@ -16,6 +17,7 @@ namespace UserService.Infrastructure
             services.AddScoped<IUserAuthenticationService, UserAuthenticationService>();
             services.AddScoped<IUserRegistrationService, UserRegistrationService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserService, UserService.Application.Services.UserService>();
 
 
             return services;

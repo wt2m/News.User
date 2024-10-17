@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,9 +48,18 @@ namespace UserService.Infrastructure.Repositories
             _context.Update(entity);
         }
 
-        public TEntity GetById(int id)
+        public async Task<TEntity> GetByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            if (id == Guid.Empty)
+                throw new Exception("Trying to retrieve an user from database with empty id.");
+
+
+            var entity = await _context.Set<TEntity>().FirstOrDefaultAsync(u => u.Id == id);
+
+            if (entity == null)
+                throw new Exception("Entity not found.");
+
+            return entity!;
         }
     }
 }

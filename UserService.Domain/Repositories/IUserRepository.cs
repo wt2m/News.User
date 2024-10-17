@@ -7,10 +7,8 @@ using UserService.Domain.Entities;
 
 namespace UserService.Domain.Repositories
 {
-    public interface IUserRepository : IAbstractRepository
+    public interface IUserRepository : IAbstractRepository<User>
     {
-        Task AddAsync(User user);
         Task<User?> GetByEmailAsync(string email);
-        Task UpdateUserPreferencesAsync(Guid userId, string preference);
     }
 }

@@ -46,7 +46,7 @@ namespace UserService.Infrastructure.Messaging.RabbitMq
                 {
                     var token = Encoding.UTF8.GetString((byte[])tokenObj).Replace("Bearer ", "");
 
-                    // Create a scope to resolve both IUserRepository and ITokenService
+                    // Create a scope to resolve both IUserService and ITokenService
                     using (var scope = _serviceProvider.CreateScope())
                     {
                         var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
@@ -54,9 +54,9 @@ namespace UserService.Infrastructure.Messaging.RabbitMq
 
                         if (userId != Guid.Empty)
                         {
-                            var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
+                            var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
                             var preference = message.Trim();
-                            await userRepository.UpdateUserPreferencesAsync(userId, preference);
+                            await userService.UpdateUserPreferencesAsync(userId, preference);
                         }
                     }
                 }

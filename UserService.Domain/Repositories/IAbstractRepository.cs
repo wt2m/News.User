@@ -14,7 +14,6 @@ namespace UserService.Domain.Repositories
         void Update(TEntity entity);
         void Update(List<TEntity> entity);
         void Delete(TEntity entity);
-
-        TEntity GetById(int id);
+        Task<TEntity> GetByIdAsync(Guid id);
     }
 }

@@ -3,10 +3,10 @@ using UserService.Domain.Repositories;
 
 namespace UserService.Application.Services
 {
-    public class UserServices : AbstractUowService, IUserService
+    public class UserService : AbstractUowService, IUserService
     {
         public IUserRepository _userRepository { get; set; }
-        public UserServices(IUserRepository userRepository, IUnitOfWork _unitOfWork) : base(_unitOfWork)
+        public UserService(IUserRepository userRepository, IUnitOfWork _unitOfWork) : base(_unitOfWork)
         {
             _userRepository = userRepository;
         }
@@ -27,7 +27,7 @@ namespace UserService.Application.Services
 
             _userRepository.Update(user);
 
-            _unitOfWork.CompleteAsync();
+            await _unitOfWork.CompleteAsync();
         }
     }
 }
