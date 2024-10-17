@@ -25,16 +25,5 @@ namespace UserService.Infrastructure.Identity
             return user;
         }
 
-        public async Task UpdateUserPreferencesAsync(Guid userId, string preference)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-
-            if(user == null)
-                return;
-            
-            user.AddPreferences(preference);
-            _context.Update(user);
-            await _context.SaveChangesAsync();
-        }
     }
 }
