@@ -7,7 +7,7 @@ using UserService.Domain.Entities;
 
 namespace UserService.Domain.Repositories
 {
-    public interface IUserRepository
+    public interface IUserRepository : IAbstractRepository
     {
         Task AddAsync(User user);
         Task<User?> GetByEmailAsync(string email);

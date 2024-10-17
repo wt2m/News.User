@@ -8,5 +8,6 @@ namespace UserService.Application.Interfaces
 {
     public interface IUserService
     {
+        Task UpdateUserPreferencesAsync(Guid userId, string preference);
     }
 }
