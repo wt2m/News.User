@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using UserService.Application.DTOs;
 using UserService.Application.Interfaces;
 using UserService.Application.Services;
@@ -48,7 +49,9 @@ namespace UserService.Api.Controllers
         {
             try
             {
-                var token = await _userAuthenticationService.AuthenticateUserAsync(request.Email, request.Password);
+                var ip = HttpContext?.Connection?.RemoteIpAddress!.ToString() ?? "";
+
+                var token = await _userAuthenticationService.AuthenticateUserAsync(request.Email, request.Password, ip);
                 if (token == null)
                 {
                     return Unauthorized("Invalid credentials.");

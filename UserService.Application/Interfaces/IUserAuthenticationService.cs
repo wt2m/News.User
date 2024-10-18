@@ -10,6 +10,6 @@ namespace UserService.Application.Services
 {
     public interface IUserAuthenticationService
     {
-        Task<string> AuthenticateUserAsync(string email, string password);
+        Task<string> AuthenticateUserAsync(string email, string password, string remoteIpAddress);
     }
 }
