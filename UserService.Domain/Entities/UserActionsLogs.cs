@@ -7,7 +7,7 @@ using UserService.Domain.Common.Enums;
 
 namespace UserService.Domain.Entities
 {
-    public class Observation
+    public class UserActionsLogs
     {
         public  string UserId { get; private set; }
         public string Action { get; private set; }
@@ -15,7 +15,7 @@ namespace UserService.Domain.Entities
         public DateTime CreatedAt { get; private set; }
         public LogType LogType { get; private set; }
 
-        public Observation(string userId, string action, string details, LogType type) { 
+        public UserActionsLogs(string userId, string action, string details, LogType type) { 
             UserId = userId;
             Action = action;
             Details = details;

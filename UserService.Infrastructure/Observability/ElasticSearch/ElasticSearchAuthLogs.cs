@@ -9,25 +9,23 @@ using UserService.Domain.Entities;
 
 namespace UserService.Infrastructure.Observability.ElasticSearch
 {
-    internal class ElasticSearchUserLogs : IUserLogs
+    public class ElasticSearchAuthLogs : IAuthenticationLogs
     {
         private readonly IElasticClient _elasticClient;
 
-        public ElasticSearchUserLogs(IElasticClient elasticClient)
+        public ElasticSearchAuthLogs(IElasticClient elasticClient)
         {
             _elasticClient = elasticClient;
         }
 
-        public async Task LogObservationAsync(UserActionsLogs observation)
+        public async Task LogFailedLoginAsync(FailedLoginAttemptLog failedLoginLog)
         {
-            var response = await _elasticClient.IndexDocumentAsync(observation);
+            var response = await _elasticClient.IndexDocumentAsync(failedLoginLog);
             if (!response.IsValid)
             {
                 // TODO: Create an error handler
             }
+            //TODO: Add method to verify if this ip is trying to access multiple accounts
         }
-
-        
-
     }
 }
