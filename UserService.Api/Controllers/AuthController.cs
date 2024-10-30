@@ -72,8 +72,8 @@ namespace UserService.Api.Controllers
         [HttpGet("verifyToken")]
         public IActionResult VerifyToken([FromQuery] string token)
         {
-            var validatedBoolean = _tokenService.VerifyTokenAsync(token);
-            if (!validatedBoolean)
+            var tokenIsValid = _tokenService.VerifyTokenAsync(token);
+            if (!tokenIsValid)
             {
                 return Unauthorized("Invalid token");
             }
