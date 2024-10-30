@@ -51,6 +51,7 @@ namespace UserService.Infrastructure.Identity
                 Issuer = _issuer,
             };
 
+
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }

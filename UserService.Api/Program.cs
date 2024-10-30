@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using System.Text;
+using UserService.Api.Middlewares;
 using UserService.Application.Interfaces;
 using UserService.Domain.Entities;
 using UserService.Domain.Repositories;
@@ -41,6 +42,8 @@ var app = builder.Build();
 var migrator = new DatabaseMigrator(app.Services);
 migrator.Migrate();
 
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 
 // Configure the HTTP request pipeline.

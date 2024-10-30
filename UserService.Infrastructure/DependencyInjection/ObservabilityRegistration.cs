@@ -18,8 +18,8 @@ namespace UserService.Infrastructure.DependencyInjection
             var settings = new ConnectionSettings(new Uri(configuration["ElasticSearch:Uri"]!));
             var client = new ElasticClient(settings);
             services.AddSingleton<IElasticClient>(client);
-            services.AddScoped<IUserLogs, ElasticSearchUserLogs>();
-            services.AddScoped<IAuthenticationLogs, ElasticSearchAuthLogs>();
+            services.AddScoped<ILogService, ElasticSearchLogs>();
+            
 
             return services;
         }

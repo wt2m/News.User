@@ -11,15 +11,15 @@ namespace UserService.Infrastructure.Identity
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
-        private readonly IAuthenticationLogs _authenticationLogs;
+        private readonly ILogService _logService;
 
         public UserAuthenticationService(IUnitOfWork unitOfWork, IUserRepository userRepository, SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager, ITokenService tokenService, IAuthenticationLogs authenticationLogs) : base(unitOfWork)
+            UserManager<ApplicationUser> userManager, ITokenService tokenService, ILogService logService) : base(unitOfWork)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _tokenService = tokenService;
-            _authenticationLogs = authenticationLogs;
+            _logService = logService;
         }
 
         public async Task<string> AuthenticateUserAsync(string email, string password, string remoteIpAddress)
@@ -30,7 +30,7 @@ namespace UserService.Infrastructure.Identity
                 throw new Exception("User not found.");
             }
 
-            var result = await _signInManager.CheckPasswordSignInAsync(userApp, password, false);
+            var result = await _signInManager.PasswordSignInAsync(userApp, password, false, true);
             if (!result.Succeeded)
             {
 
@@ -38,8 +38,8 @@ namespace UserService.Infrastructure.Identity
 
                 if (attempts > 3)
                 {
-                    var failedLogin = new FailedLoginAttemptLog(userApp.Id, remoteIpAddress);
-                    _ = _authenticationLogs.LogFailedLoginAsync(failedLogin);
+                    var failedLogin = new FailedLoginAttemptLog(userApp.Id, remoteIpAddress, "");
+                    _ = _logService.Log(failedLogin);
                 }
 
                 throw new Exception("Invalid credentials.");

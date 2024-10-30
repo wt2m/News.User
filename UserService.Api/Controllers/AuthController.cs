@@ -47,6 +47,9 @@ namespace UserService.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] AuthenticateUserRequest request)
         {
+            var ip2 = HttpContext?.Connection?.RemoteIpAddress!.ToString() ?? "";
+
+            var token2 = await _userAuthenticationService.AuthenticateUserAsync(request.Email, request.Password, ip2);
             try
             {
                 var ip = HttpContext?.Connection?.RemoteIpAddress!.ToString() ?? "";

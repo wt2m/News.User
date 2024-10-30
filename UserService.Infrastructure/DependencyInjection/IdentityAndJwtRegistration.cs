@@ -24,14 +24,13 @@ namespace UserService.Infrastructure.DependencyInjection
 
             // Add Identity services
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
-                    {
-                        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5); 
-                        options.Lockout.MaxFailedAccessAttempts = 5; 
-                        options.Lockout.AllowedForNewUsers = true; 
-                    }
-                )
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            {
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
             // Add JWT authentication
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

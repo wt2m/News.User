@@ -4,23 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UserService.Domain.Common.Enums;
+using UserService.Domain.Entities.Abstract;
 
 namespace UserService.Domain.Entities
 {
-    public class UserActionsLogs
+    public class UserActionsLogs : PersistentLog
     {
         public  string UserId { get; private set; }
         public string Action { get; private set; }
-        public string Details { get; private set; }
-        public DateTime CreatedAt { get; private set; }
         public LogType LogType { get; private set; }
 
-        public UserActionsLogs(string userId, string action, string details, LogType type) { 
+        public UserActionsLogs(string userId, string action, string details, LogType type) : base(details) { 
             UserId = userId;
             Action = action;
-            Details = details;
             LogType = type;
-            CreatedAt = DateTime.Now;
         }
     }
 }

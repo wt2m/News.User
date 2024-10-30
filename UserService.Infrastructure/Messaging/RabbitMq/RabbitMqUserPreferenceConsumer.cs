@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UserService.Application.Interfaces;
 using UserService.Application.Services;
+using UserService.Domain.Entities;
 using UserService.Domain.Repositories;
 
 namespace UserService.Infrastructure.Messaging.RabbitMq
@@ -41,14 +42,14 @@ namespace UserService.Infrastructure.Messaging.RabbitMq
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var headers = ea.BasicProperties.Headers;
-
-                if (headers.TryGetValue("Authorization", out object tokenObj))
+                using (var scope = _serviceProvider.CreateScope())
                 {
-                    var token = Encoding.UTF8.GetString((byte[])tokenObj).Replace("Bearer ", "");
-
-                    // Create a scope to resolve both IUserService and ITokenService
-                    using (var scope = _serviceProvider.CreateScope())
+                    if (headers.TryGetValue("Authorization", out object tokenObj))
                     {
+                        var token = Encoding.UTF8.GetString((byte[])tokenObj).Replace("Bearer ", "");
+
+                        // Create a scope to resolve both IUserService and ITokenService
+                    
                         var tokenService = scope.ServiceProvider.GetRequiredService<ITokenService>();
                         var userId = tokenService.GetUserIdByToken(token);
 
@@ -58,6 +59,13 @@ namespace UserService.Infrastructure.Messaging.RabbitMq
                             var preference = message.Trim();
                             await userService.UpdateUserPreferencesAsync(userId, preference);
                         }
+                    } else
+                    {
+                        var userLogsService = scope.ServiceProvider.GetRequiredService<ILogService>();
+
+                        //var log = new UserActionsLogs()
+
+                        //userLogsService.LogObservationAsync()
                     }
                 }
             };
