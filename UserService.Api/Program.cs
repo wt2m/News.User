@@ -1,18 +1,6 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Globalization;
-using System.Text;
 using UserService.Api.Middlewares;
-using UserService.Application.Interfaces;
-using UserService.Domain.Entities;
-using UserService.Domain.Repositories;
 using UserService.Infrastructure;
-using UserService.Infrastructure.Data;
 using UserService.Infrastructure.DependencyInjection;
-using UserService.Infrastructure.Identity;
 
 
 
@@ -25,10 +13,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
-builder.Services.AddIdentityAndJwtRegistration(builder.Configuration);
-
 // Add application services
+builder.Services.ConnectToDatabase(builder.Configuration, options => options.UseSQLServer = true);
+builder.Services.AddIdentityAndJwtRegistration(builder.Configuration);
 builder.Services.AddInfrastructureServices();
 builder.Services.AddRabbitMq(builder.Configuration);
 builder.Services.AddObservability(builder.Configuration);

@@ -18,9 +18,7 @@ namespace UserService.Infrastructure.DependencyInjection
     {
         public static IServiceCollection AddIdentityAndJwtRegistration(this IServiceCollection services, IConfiguration configuration)
         {
-            // Add the ApplicationDbContext with SQL Server
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            
 
             // Add Identity services
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
