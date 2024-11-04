@@ -9,7 +9,7 @@ using UserService.Infrastructure.DependencyInjection;
 
 namespace UserService.Tests.Fixtures
 {
-    public class UserAuthTestSetupFixture : IDisposable
+    public class UserAuthTestSetupFixture : IAsyncLifetime
     {
         public ServiceProvider ServiceProvider { get; private set; }
         public Mock<IUnitOfWork> UnitOfWorkMock { get; private set; }
@@ -67,6 +67,18 @@ namespace UserService.Tests.Fixtures
             services.AddSingleton(LoggerMock.Object);
         }
 
-        public void Dispose() => ServiceProvider?.Dispose();
+        public Task InitializeAsync()
+        {
+            // Any async initialization can go here if necessary.
+            return Task.CompletedTask;
+        }
+
+        public async Task DisposeAsync()
+        {
+            if (ServiceProvider != null)
+            {
+                await ServiceProvider.DisposeAsync();
+            }
+        }
     }
 }

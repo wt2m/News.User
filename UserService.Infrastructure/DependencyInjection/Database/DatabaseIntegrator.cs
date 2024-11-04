@@ -25,7 +25,7 @@ namespace UserService.Infrastructure.DependencyInjection
             if (options.UseInMemoryCache)
             {
                 // Use InMemory database for testing or lightweight scenarios
-                services.AddDbContext<ApplicationDbContext>(opt => opt.UseInMemoryDatabase("InMemoryDb"));
+                services.AddDbContext<ApplicationDbContext>(opt => opt.UseInMemoryDatabase($"InMemoryDb_{Guid.NewGuid()}"));
             }
             else if (options.UseSQLServer)
             {
